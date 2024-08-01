@@ -4,6 +4,7 @@ all: build
 build:
 	@mkdir -p obj/ bin/ iso/
 	make -C src/boot
+	make -C src/kernel
 
 mk_img:
 	mkdir -p obj/
@@ -12,6 +13,7 @@ mk_img:
 	mmd -i mmlv.img ::/EFI
 	mmd -i mmlv.img ::/EFI/BOOT
 	mcopy -i mmlv.img bin/BOOTX64.efi ::/EFI/BOOT
+	mcopy -i mmlv.img src/kernel/kernel.elf ::
 
 run_qemu: mmlv.img
 	qemu-system-x86_64 -cpu qemu64 \
@@ -23,3 +25,4 @@ run_qemu: mmlv.img
 clean:
 	rm *.img *.iso bin/ obj/ iso/ -rf
 	make -C src/boot clean
+	make -C src/kernel clean
