@@ -1,0 +1,15 @@
+*.o
+*.so
+*.efi
+*.elf
+
+*.img
+*.iso
+
+obj/
+bin/
+
+.vscode/
+swp/
+
+fs/
