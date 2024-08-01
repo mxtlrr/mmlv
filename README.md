@@ -6,8 +6,8 @@ mmlv is a monolithic UEFI kernel.
 ## 1: Getting POSIX-UEFI
 ```sh
 $ git clone https://gitlab.com/bztsrc/posix-uefi.git
-$ cd mmlv
-$ ln -s ../posix-uefi/uefi
+$ cd mmlv/src/boot
+$ ln -s ../../../posix-uefi/uefi
 ```
 
 ## 2: Compiling
