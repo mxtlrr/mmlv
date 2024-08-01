@@ -1,42 +1,6 @@
 #include <uefi.h>
 
-
-#define ELFMAG      "\177ELF"
-#define SELFMAG     4
-#define EI_CLASS    4       /* File class byte index */
-#define ELFCLASS64  2       /* 64-bit objects */
-#define EI_DATA     5       /* Data encoding byte index */
-#define ELFDATA2LSB 1       /* 2's complement, little endian */
-#define ET_EXEC     2       /* Executable file */
-typedef struct {
-  uint8_t  e_ident[16];   /* Magic number and other info */
-  uint16_t e_type;        /* Object file type */
-  uint16_t e_machine;     /* Architecture */
-  uint32_t e_version;     /* Object file version */
-  uint64_t e_entry;       /* Entry point virtual address */
-  uint64_t e_phoff;       /* Program header table file offset */
-  uint64_t e_shoff;       /* Section header table file offset */
-  uint32_t e_flags;       /* Processor-specific flags */
-  uint16_t e_ehsize;      /* ELF header size in bytes */
-  uint16_t e_phentsize;   /* Program header table entry size */
-  uint16_t e_phnum;       /* Program header table entry count */
-  uint16_t e_shentsize;   /* Section header table entry size */
-  uint16_t e_shnum;       /* Section header table entry count */
-  uint16_t e_shstrndx;    /* Section header string table index */
-} Elf64_Ehdr;
-
-typedef struct {
-  uint32_t p_type;        /* Segment type */
-  uint32_t p_flags;       /* Segment flags */
-  uint64_t p_offset;      /* Segment file offset */
-  uint64_t p_vaddr;       /* Segment virtual address */
-  uint64_t p_paddr;       /* Segment physical address */
-  uint64_t p_filesz;      /* Segment size in file */
-  uint64_t p_memsz;       /* Segment size in memory */
-  uint64_t p_align;       /* Segment alignment */
-} Elf64_Phdr;
-
-
+#include "structs.h"
 
 int main(){
   // Try and read the kernel
@@ -88,8 +52,73 @@ int main(){
   /* free resources */
   free(buff);
 
+
+  // Get GOP
+  efi_guid_t gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+  efi_gop_t* gop;
+
+  efi_status_t s = BS->LocateProtocol(&gopGuid, NULL, (void**)&gop);
+  if(EFI_ERROR(s)){
+    printf("Cannot find GOP on this machine. :(\n");
+    return 2;
+  }
+
+  // Get current mode
+  efi_gop_mode_info_t* info;
+  uintn_t sizeInfo, numModes, nativeMode;
+
+  s = gop->QueryMode(gop, gop->Mode == NULL ? 0 : gop->Mode->Mode,
+                    &sizeInfo, &info);
+  if(s == EFI_NOT_STARTED){
+    s = gop->SetMode(gop, 0);
+  }
+
+  // Error?
+  if(EFI_ERROR(s)){
+    printf("Can't get native mode...\n :/");
+    return 3;
+  } else {
+    nativeMode = gop->Mode->Mode;
+    numModes   = gop->Mode->MaxMode;
+  }
+
+  // Find the one that is 1024 by 768.
+  int modeNumber = 0;
+  for(uintn_t i = 0; i < numModes; i++){
+    s = gop->QueryMode(gop, i, &sizeInfo, &info);
+    if(info->HorizontalResolution == 1024
+      && info->VerticalResolution == 768){
+        modeNumber = i;
+        break;
+    }
+  }
+
+  printf("We are going to set GOP mode %d...\n", modeNumber);
+  s = gop->SetMode(gop, modeNumber);
+  if(EFI_ERROR(s)){
+    printf("Couldn't set... :(\n");
+    return 4;
+  }
+
+  printf("FB addr -> %p, Size %d -- PPSL %d.\n",
+          gop->Mode->FrameBufferBase,
+          gop->Mode->FrameBufferSize,
+          gop->Mode->Information->PixelsPerScanLine);
+
+  // Set up to send to kernel.
+  framebuffer_t fb = {
+    .addr    = gop->Mode->FrameBufferBase,
+    .bufsize = gop->Mode->FrameBufferSize,
+    .ppsl    = gop->Mode->Information->PixelsPerScanLine,
+
+    /* Also send some information relating to GOP's mode. */
+    .height  = gop->Mode->Information->VerticalResolution,
+    .width   = gop->Mode->Information->HorizontalResolution
+  };
+
+
   printf("Kernel is at 0x%p\n", entry);
-  i = (*((int(* __attribute__((sysv_abi)))(void))(entry)))();
+  i = (*((int(* __attribute__((sysv_abi)))(framebuffer_t*))(entry)))(&fb);
   printf("Return value: %d\n", i);
 
   while(1);
