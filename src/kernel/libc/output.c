@@ -69,6 +69,12 @@ void writestring(char* s){
         y = 0;
       }
       continue;
+    } else if(c == '\t'){
+      x += chr[4]+1;
+      x += chr[4]+1;
+      x += chr[4]+1;
+      x += chr[4]+1;
+      continue;
     }
 
 
