@@ -3,6 +3,8 @@
 #include "libc/output.h"
 #include "fb.h"
 
+#include "cpu/irqs/kb.h"
+
 extern void load_gdt(); // gdt.asm
 
 int _start(bootinfo_t* bootp){
@@ -12,8 +14,13 @@ int _start(bootinfo_t* bootp){
   printf("[init] GDT loaded.\n");
 
   idt_init();
-  printf("[init] IDT up and running.\n\n");
-  asm("int $0x3");  // Should cause ISR to trigger.
-  while(1) asm("hlt");
+  printf("[init] IDT up and running.\n");
+
+  init_irqs();
+  printf("[init] Set up IRQs...\n");
+
+  while(1) {
+    asm("hlt");
+  }
   return 0;
 }

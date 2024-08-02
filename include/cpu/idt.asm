@@ -73,3 +73,80 @@ isr_stub_table:
   dq isr_stub_%+i
 %assign i i+1
 %endrep
+
+
+
+;; we're gonna do the same thing for irqs
+
+%macro IRQ 2
+irq_stub_%1:
+  cli
+  push byte %2
+  jmp irq_cstb
+%endmacro
+
+IRQ   0,    32
+IRQ   1,    33
+IRQ   2,    34
+IRQ   3,    35
+IRQ   4,    36
+IRQ   5,    37
+IRQ   6,    38
+IRQ   7,    39
+IRQ   8,    40
+IRQ   9,    41
+IRQ  10,    42
+IRQ  11,    43
+IRQ  12,    44
+IRQ  13,    45
+IRQ  14,    46
+IRQ  15,    47
+
+extern irq_handler
+irq_cstb:
+  push rdi
+  push rsi
+  push rbp
+  push rsp
+  push rbx
+  push rdx
+  push rcx
+  push rax
+
+  mov ax, ds
+  push rax
+
+  mov ax, 0x10
+  mov ds, ax
+  mov es, ax
+  mov fs, ax
+  mov gs, ax
+
+  call irq_handler
+
+  pop rbx
+  mov ds, bx
+  mov es, bx
+  mov fs, bx
+  mov gs, bx
+
+  pop rax
+  pop rcx
+  pop rdx
+  pop rbx
+  pop rsp
+  pop rbp
+  pop rsi
+  pop rdi
+
+  add rsp, 8 ;; or 4?
+  iretq
+
+
+global irq_stub_table
+irq_stub_table:
+%assign j 0
+%rep 16
+  dq irq_stub_%+j
+%assign j j+1
+%endrep
