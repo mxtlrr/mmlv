@@ -12,5 +12,4 @@ bin/
 .vscode/
 swp/
 
-fs/
 uefi

@@ -4,7 +4,7 @@
 
 int main(){
   // Try and read the kernel
-  FILE* f; char* buff; long int size;
+  FILE* f; char* buff; long int size = 0;
 
   /// First we need to obviously read the file
   if(f = fopen("kernel.elf", "r")){
@@ -109,16 +109,19 @@ int main(){
   framebuffer_t fb = {
     .addr    = gop->Mode->FrameBufferBase,
     .bufsize = gop->Mode->FrameBufferSize,
-    .ppsl    = gop->Mode->Information->PixelsPerScanLine,
+    .pitch   = (sizeof(uint32_t))*gop->Mode->Information->PixelsPerScanLine,
 
     /* Also send some information relating to GOP's mode. */
     .height  = gop->Mode->Information->VerticalResolution,
     .width   = gop->Mode->Information->HorizontalResolution
   };
 
+  bootinfo_t bootp = {
+    .fb = &fb
+  };
 
   printf("Kernel is at 0x%p\n", entry);
-  i = (*((int(* __attribute__((sysv_abi)))(framebuffer_t*))(entry)))(&fb);
+  i = (*((int(* __attribute__((sysv_abi)))(bootinfo_t*))(entry)))(&bootp);
   printf("Return value: %d\n", i);
 
   while(1);

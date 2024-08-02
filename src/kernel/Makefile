@@ -9,7 +9,7 @@ override OFILES := $(shell find . -type f -name '*.o')
 
 
 CFLAGS  := -fno-stack-protector -fno-stack-check -ffreestanding \
-				 	 -D__$(ARCH)__ -I../../include/
+				 	 -D__$(ARCH)__ -I../../include/ -nolibc
 LDFLAGS := -nostdlib -z max-page-size=0x1000 -Ttext=0x01000000
 
 all: build

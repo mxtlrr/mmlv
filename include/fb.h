@@ -2,14 +2,13 @@
 
 #include <stdint.h>
 
-typedef struct {
-  uint64_t addr;
-  uint64_t bufsize;
-  uint32_t ppsl;
-
-  uint32_t height;
-  uint32_t width;
-} framebuffer_t;
+#include "structs.h"
 
 // Draws a pixel at (x,y) with color 0xRRGGBB.
 void putpixel(framebuffer_t* fb_gop, int x, int y, uint32_t color);
+
+extern unsigned char font_data[8283];
+extern ssfn_font_t* font;
+
+extern bootinfo_t* bootp;
+void set_bootp(bootinfo_t* param);
