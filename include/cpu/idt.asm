@@ -81,6 +81,7 @@ isr_stub_table:
 %macro IRQ 2
 irq_stub_%1:
   cli
+  push byte 0
   push byte %2
   jmp irq_cstb
 %endmacro
@@ -139,7 +140,7 @@ irq_cstb:
   pop rsi
   pop rdi
 
-  add rsp, 8 ;; or 4?
+  add rsp, 8
   iretq
 
 
