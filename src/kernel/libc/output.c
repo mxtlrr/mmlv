@@ -42,6 +42,14 @@ void printf(char* fmt, ...){
 	}
 }
 
+uint32_t color = 0xffffff;
+void     setcolor(uint32_t newcolor){
+  color = newcolor;
+}
+uint32_t getcolor(){
+  return color;
+}
+
 // Internal function -- Never should be used by itself
 void writestring(char* s){
   unsigned char *ptr, *chr, *frg;
@@ -96,7 +104,7 @@ void writestring(char* s){
       for(m = 1; j; j--, n++, o += bootp->fb->pitch)
         for(p = o, l = 0; l < k; l++, p += 4, m <<= 1) {
           if(m > 0x80) { frg++; m = 1; }
-          if(*frg & m) *((unsigned int*)p) = 0xFFFFFF;
+          if(*frg & m) *((unsigned int*)p) = color;
         }
     }
     x += chr[4]+1; y += chr[5];
