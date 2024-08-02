@@ -1,4 +1,5 @@
 #include "libc/output.h"
+#include "libc/string.h"
 #include "fb.h"
 
 int x = 0; int y = 0;
@@ -12,6 +13,34 @@ void puts(char* fmt){
   writestring(fmt);
 }
 
+
+void printf(char* fmt, ...){
+  va_list ap;
+  va_start(ap, fmt);
+
+  char* ptr;
+  	for (ptr = fmt; *ptr != '\0'; ++ptr) {
+		if (*ptr == '%') {
+			++ptr;
+			switch (*ptr) {
+				case 's':	// string
+					puts(va_arg(ap, char*));
+					break;
+				case 'd': // integer
+					puts(tostring(va_arg(ap, int), 10));
+					break;
+				case 'x': // hexadecimal
+					puts(tostring(va_arg(ap, uint32_t), 16));
+					break;
+				case 'c':
+					putc(va_arg(ap, int));
+			}
+		} else {
+			char t[2] = { *ptr, 0 };
+			puts(t);
+		}
+	}
+}
 
 // Internal function -- Never should be used by itself
 void writestring(char* s){
@@ -30,9 +59,15 @@ void writestring(char* s){
 
 
     // TODO: implement scrolling
+    // This one's kinda shitty.
     if(c == '\n'){
-      x = 0;
-      y += font->height;
+      int tmp = y + font->height;
+      if(y != 1024 || tmp < 1024){
+        x = 0;
+        y += font->height;
+      } else {
+        y = 0;
+      }
       continue;
     }
 

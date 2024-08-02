@@ -4,8 +4,7 @@
 int _start(bootinfo_t* bootp){
   set_bootp(bootp);
 
-  puts("Wow\nThis operating system sucks...\n\n");
-  puts(__DATE__);
+  printf("Testing %d. Hex address 0x%x", 123, 0xDEADBEEF);
   while(1);
   return 0;
 }
