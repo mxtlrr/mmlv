@@ -19,3 +19,11 @@ make
 Run `make qemu` to run in QEMU -- Firmware is in the `ovmf/` directory. If you would
 like to build an ISO, the `./build_iso.sh` script is available. Note that in order
 to run that script, you need to have a `mmlv.img` existing (run `make`).
+
+# Code Credit
+| Function | Credit |
+| -------- | ------ |
+|`writestring`| bzt |
+
+# Roadmap
+[See this file](./ROADMAP.md)
