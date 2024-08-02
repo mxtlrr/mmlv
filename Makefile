@@ -13,6 +13,7 @@ mk_img:
 	mmd -i mmlv.img ::/EFI
 	mmd -i mmlv.img ::/EFI/BOOT
 	mcopy -i mmlv.img bin/BOOTX64.efi ::/EFI/BOOT
+	mcopy -i mmlv.img src/startup.nsh ::
 	mcopy -i mmlv.img src/kernel/kernel.elf ::
 
 run_qemu: mmlv.img
