@@ -63,6 +63,16 @@ isr_cstb:
   mov gs, ax
 
   call exception_handler
+
+  pop rax
+  pop rax
+  pop rcx
+  pop rdx
+  pop rbx
+  pop rsp
+  pop rbp
+  pop rsi
+  pop rdi
   iretq
 
 
@@ -140,7 +150,7 @@ irq_cstb:
   pop rsi
   pop rdi
 
-  add rsp, 8
+  add rsp, 16
   iretq
 
 
