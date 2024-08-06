@@ -43,6 +43,28 @@ isr_no_err_stub 29
 isr_err_stub    30
 isr_no_err_stub 31
 
+%macro PUSH_N 0
+  push r8
+  push r9
+  push r10
+  push r11
+  push r12
+  push r13
+  push r14
+  push r15
+%endmacro
+
+%macro POP_N 0
+  pop r15
+  pop r14
+  pop r13
+  pop r12
+  pop r11
+  pop r10
+  pop r9
+  pop r8
+%endmacro
+
 isr_cstb:
   push rdi
   push rsi
@@ -52,6 +74,8 @@ isr_cstb:
   push rdx
   push rcx
   push rax
+
+  PUSH_N
 
   mov ax, ds
   push rax
@@ -73,6 +97,10 @@ isr_cstb:
   pop rbp
   pop rsi
   pop rdi
+
+  POP_N
+
+  add rsp, 16
   iretq
 
 
@@ -123,6 +151,8 @@ irq_cstb:
   push rcx
   push rax
 
+  PUSH_N
+
   mov ax, ds
   push rax
 
@@ -139,6 +169,8 @@ irq_cstb:
   mov es, bx
   mov fs, bx
   mov gs, bx
+
+  POP_N
 
   pop rax
   pop rcx
