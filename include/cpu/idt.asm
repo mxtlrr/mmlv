@@ -1,6 +1,6 @@
 %macro isr_err_stub 1
 isr_stub_%+%1:
-  call exception_handler
+  jmp isr_cstb
 %endmacro
 
 %macro isr_no_err_stub 1
@@ -84,9 +84,9 @@ isr_stub_table:
 %assign i i+1
 %endrep
 
-
-
 ;; we're gonna do the same thing for irqs
+
+extern irq_handler
 
 %macro IRQ 2
 irq_stub_%1:
@@ -113,7 +113,6 @@ IRQ  13,    45
 IRQ  14,    46
 IRQ  15,    47
 
-extern irq_handler
 irq_cstb:
   push rdi
   push rsi
@@ -157,7 +156,7 @@ irq_cstb:
 global irq_stub_table
 irq_stub_table:
 %assign j 0
-%rep 16
+%rep 15
   dq irq_stub_%+j
 %assign j j+1
 %endrep

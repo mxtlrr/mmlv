@@ -71,20 +71,23 @@ void init_irqs(){
 
 isr_t interrupt_handlers[256];
 void irq_handler(registers_t r){
-  if(interrupt_handlers[r.int_no] != 0){
-    // go handle it
-    isr_t hdlr = interrupt_handlers[r.int_no];
-    hdlr(r);
-  }
-
   // Send EOI
   if(r.int_no >= 40) {
     outb(0xa0, 0x20);
   }
   // reset to master aswell
   outb(0x20, 0x20);
+
+  printf("IRQ interrupt recv. r.int_no=%d (0x%x)\n", r.int_no, r.int_no);
+  if(interrupt_handlers[r.int_no] != 0){
+    // go handle it
+    isr_t hdlr = interrupt_handlers[r.int_no];
+    hdlr(r);
+  }
+
 }
 
 void register_irq(uint8_t n, isr_t handler){
+  printf("Registered IRQ %d\n", n);
   interrupt_handlers[n] = handler;
 }

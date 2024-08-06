@@ -1,4 +1,5 @@
 #include "cpu/idtr.h"
+#include "cpu/irq/pit.h"
 
 #include "libc/output.h"
 #include "fb.h"
@@ -17,6 +18,11 @@ int _start(bootinfo_t* bootp){
 
   init_irqs();
   printf("[init] Set up IRQs...\n");
+
+  setcolor(0x00ff00);
+  printf("[test] testing PIT interrupt.\n");
+
+  register_pit();
 
   while(1) {
     asm("hlt");
