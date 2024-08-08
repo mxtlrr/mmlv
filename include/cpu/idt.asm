@@ -1,10 +1,12 @@
 %macro isr_err_stub 1
 isr_stub_%+%1:
+  push byte %1
   jmp isr_cstb
 %endmacro
 
 %macro isr_no_err_stub 1
 isr_stub_%+%1:
+  push byte 0
   push byte %1
   jmp isr_cstb
 %endmacro
@@ -118,7 +120,6 @@ extern irq_handler
 
 %macro IRQ 2
 irq_stub_%1:
-  cli
   push byte 0
   push byte %2
   jmp irq_cstb

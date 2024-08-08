@@ -1,6 +1,6 @@
 #include "cpu/irq/pit.h"
 
-void hdlr(registers_t r){
+void hdlr(registers_t* r){
   printf("INT 20");
 }
 

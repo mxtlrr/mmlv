@@ -25,8 +25,7 @@ int _start(bootinfo_t* bootp){
   register_pit();
 
   while(1) {
-    printf("Hi.\n");
-    // asm("hlt");
+    asm("hlt");
   }
 
   for(;;);

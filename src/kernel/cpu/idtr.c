@@ -64,7 +64,7 @@ void idt_init() {
 void init_irqs(){
   // 32 to 47
   for(uint8_t vector = 32; vector < 48; vector++){
-    idt_set_descriptor(vector, irq_stub_table[vector], 0x8e);
+    idt_set_descriptor(vector, irq_stub_table[vector-32], 0x8e);
     vectors[vector] = true;
   }
 }
@@ -76,7 +76,7 @@ void irq_handler(registers_t r){
   if(interrupt_handlers[r.int_no] != 0){
     // go handle it
     isr_t hdlr = interrupt_handlers[r.int_no];
-    hdlr(r);
+    hdlr(&r);
   }
 
   // Send EOI
