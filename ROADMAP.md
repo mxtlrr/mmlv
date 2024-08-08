@@ -8,10 +8,22 @@
   - [X] `puts`, `putc,`, `printf`
 
 # Phase 1: Stuff from the CPU
-- [ ] Redo GDT, since I'm not entirely sure UEFI gives us a valid one
-- [ ] Interrupts
-  - [ ] Create valid 64-bit IDT
-  - [ ] Implement ISRs
-  - [ ] IRQs
-    - [ ] PIT
-    - [ ] PS/2 Keyboard
+- [X] Redo GDT, since I'm not entirely sure UEFI gives us a valid one
+- [X] Interrupts
+  - [X] Create valid 64-bit IDT
+  - [X] Implement ISRs
+  - [X] IRQs
+    - [X] PIT
+
+*Note: PS/2 Keyboard driver comes later :^)*
+# Phase 2: FS / User utility
+- [ ] Primitive file system
+  - [ ] Initrd (`initrd/` directory)
+- [ ] Switch to user mode
+  - [ ] System calls
+  - [ ] Implement either COFF or ELF
+
+# Phase 3: Memory / Paging etc
+*Maybe this should come before phase 2..*
+
+- [ ] Setup a kernel heap
