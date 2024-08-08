@@ -5,5 +5,5 @@ void hdlr(registers_t* r){
 }
 
 void register_pit(){
-  register_irq(32, &hdlr);
+  register_irq(32, hdlr);
 }

@@ -7,7 +7,7 @@ int main(){
   FILE* f; char* buff; long int size = 0;
 
   /// First we need to obviously read the file
-  if(f = fopen("kernel.elf", "r")){
+  if((f = fopen("kernel.elf", "r"))){
     // Get size
     fseek(f, 0, SEEK_END);
     size = ftell(f);
