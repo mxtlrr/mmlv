@@ -55,9 +55,6 @@ void idt_init() {
   __asm__ volatile ("lidt %0" : : "m"(idtr));
 
   remap_pic(); // Remap PIC so we can do stuff without the IRQs overlapping.
-
-  // Turn on interrupts
-  __asm__ volatile ("sti");
 }
 
 void init_irqs(){
@@ -66,19 +63,22 @@ void init_irqs(){
     idt_set_descriptor(vector, irq_stub_table[vector-32], 0x8e);
     vectors[vector] = true;
   }
+
+  // Turn on interrupts
+  __asm__ volatile ("sti");
 }
 
 isr_t interrupt_handlers[256];
-void irq_handler(registers_t r){
+void irq_handler(registers_t *r){
 
-  if(interrupt_handlers[r.int_no] != 0){
+  if(interrupt_handlers[r->int_no] != 0){
     // go handle it
-    isr_t hdlr = interrupt_handlers[r.int_no];
-    hdlr(&r);
+    isr_t hdlr = interrupt_handlers[r->int_no];
+    hdlr(r);
   }
 
   // Send EOI
-  if(r.int_no >= 40) {
+  if(r->int_no >= 40) {
     outb(0xa0, 0x20);
   }
   // reset to master aswell

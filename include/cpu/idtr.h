@@ -25,7 +25,8 @@ typedef struct {
 }__attribute__((packed)) idtr_t;
 
 typedef struct registers {
-	uint64_t ds, r15, r14, r13, r12, r11, r10, r9, r8;
+	uint64_t gs, fs, es, ds;
+	uint64_t r15, r14, r13, r12, r11, r10, r9, r8;
 	uint64_t rax, rcx, rdx, rbx, useless_rsp, rpb, rsi, rdi;
 	uint64_t int_no, err_code;
 	uint64_t rip, cs, rflags, rsp, ss;
@@ -36,5 +37,5 @@ void idt_init();
 void init_irqs();
 
 typedef void (*isr_t)(registers_t*);
-void irq_handler(registers_t r);
+void irq_handler(registers_t *r);
 void register_irq(uint8_t n, isr_t handler);
