@@ -85,6 +85,16 @@ void writestring(char* s){
       continue;
     }
 
+    if(x+10 >= 1010){
+      x = 0;
+      y += font->height;
+      continue;
+    }
+
+    if(y > 760){
+      y = 0;
+      continue;
+    }
 
     for(ptr = (unsigned char*)font + font->characters_offs, chr = 0, i = 0; i < 0x110000; i++) {
       if(ptr[0] == 0xFF) { i += 65535; ptr++; }

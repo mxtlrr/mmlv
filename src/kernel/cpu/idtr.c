@@ -72,6 +72,7 @@ isr_t interrupt_handlers[256];
 void irq_handler(registers_t *r){
 
   if(interrupt_handlers[r->int_no] != 0){
+
     // go handle it
     isr_t hdlr = interrupt_handlers[r->int_no];
     hdlr(r);
