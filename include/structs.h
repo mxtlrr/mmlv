@@ -12,6 +12,17 @@ typedef struct {
   uint32_t width;
 } framebuffer_t;
 
+/* Memory map */
+
+/// Each block is a part of the memory map.
+/// It contains data on whether or not it is free,
+/// its location, etc.
+typedef struct {
+  uint64_t  location; // Physical
+  uint64_t  size;     // How big is this block?
+  uint8_t   free;     // 0 - Free, 1 - Used
+} block_t;
+
 
 typedef struct {
   unsigned char  magic[4];
@@ -34,4 +45,5 @@ typedef struct {
 typedef struct {
   framebuffer_t* fb;
   ssfn_font_t* font;
+  block_t blocks[256];
 } bootinfo_t;

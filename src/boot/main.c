@@ -93,6 +93,76 @@ int main(){
     }
   }
 
+  // Memory map
+  efi_status_t status;
+  efi_memory_descriptor_t *memory_map = NULL, *mement;
+  uintn_t memory_map_size=0, map_key=0, desc_size=0;
+
+  int block_ctr = 0;
+
+  status = BS->GetMemoryMap(&memory_map_size, NULL, &map_key, &desc_size, NULL);
+  if(status != EFI_BUFFER_TOO_SMALL || !memory_map_size){
+    printf("Can't get the memory map!\n");
+    return 2;
+  }
+
+  /* in worst case malloc allocates two blocks, and each block might split a record into three, that's 4 additional records */
+  memory_map_size += 4 * desc_size;
+  memory_map = (efi_memory_descriptor_t*)malloc(memory_map_size);
+  
+  if(!memory_map) {
+    fprintf(stderr, "unable to allocate memory\n");
+    for(;;);
+  }
+  status = BS->GetMemoryMap(&memory_map_size, memory_map,
+                            &map_key, &desc_size, NULL);
+  if(EFI_ERROR(status)) {
+    fprintf(stderr, "Unable to get memory map\n");
+    for(;;);
+  }
+
+  mement = memory_map;
+  block_t blocks[256];
+  
+  do {
+    if(mement->Type == EfiConventionalMemory){
+      blocks[block_ctr].free = 0;
+      blocks[block_ctr].location = (uintptr_t)mement->PhysicalStart;
+      blocks[block_ctr].size = mement->NumberOfPages;
+
+      block_ctr++;
+    }
+    mement = NextMemoryDescriptor(mement, desc_size);
+  } while((uint8_t*)mement < (uint8_t*)memory_map + memory_map_size);
+
+  free(memory_map);
+
+  // Now the fun part.
+  // We can probe a random location in memory, i.e. 0x7FFFFFF_0000000
+  // to 0x7FFFFFF_FFFFFFF and use that as our new block. In order to
+  // prevent anything weird from happening, we make sure that:
+  //    1. 0x7FFFFFF_0000000 is 0
+  //    2. All values are set to zero
+  uint64_t d = (*(uint64_t*)0x70000FFF);
+
+  // Weirdly, I get a GPF if use the mentioned address in the comment above
+  // So we'll use 0x70000FFF for now.
+  if(d != 0){
+    printf("Hm.... Open an issue on GitHub. I tried use extra memory for mmap.\n");
+    for(;;);
+  }
+  uint64_t size_mmap = (0x7FFFFFFF - 0x70000FFF);
+
+
+  printf("Got here.\n");
+  // If we're still here, then we didn't get a GPF. Add this memory
+  // location to the blocks
+  blocks[block_ctr].free = 0;
+  blocks[block_ctr].location = 0x70000FFF;
+  blocks[block_ctr].size = size_mmap;
+
+  block_ctr++;
+
   printf("We are going to set GOP mode %d...\n", modeNumber);
   s = gop->SetMode(gop, modeNumber);
   if(EFI_ERROR(s)){
@@ -117,7 +187,8 @@ int main(){
   };
 
   bootinfo_t bootp = {
-    .fb = &fb
+    .fb = &fb,
+    .blocks = blocks // This raises a warning. Why?
   };
 
   printf("Kernel is at 0x%p\n", entry);

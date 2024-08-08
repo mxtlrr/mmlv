@@ -12,7 +12,6 @@ typedef struct {
   uint32_t width;
 } framebuffer_t;
 
-
 typedef struct {
   unsigned char  magic[4];
   unsigned int   size;
@@ -29,11 +28,22 @@ typedef struct {
   unsigned int   cmap_offs;
 } __attribute__((packed)) ssfn_font_t;
 
+/* Memory map */
 
-/* Bootloader stuff (stuff to pass to the bootloader) */
+/// Each block is a part of the memory map.
+/// It contains data on whether or not it is free,
+/// its location, etc.
+typedef struct {
+  uint64_t  location; // Physical
+  uint64_t  size;     // How big is this block?
+  uint8_t   free;     // 0 - Free, 1 - Used
+} block_t;
+
+/* Bootloader stuff (stuff to pass to the kernel) */
 typedef struct {
   framebuffer_t* fb;
   ssfn_font_t* font;
+  block_t blocks[256];
 } bootinfo_t;
 
 
