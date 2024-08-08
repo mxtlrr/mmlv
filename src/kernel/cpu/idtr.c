@@ -57,7 +57,6 @@ void idt_init() {
   remap_pic(); // Remap PIC so we can do stuff without the IRQs overlapping.
 }
 
-// TODO: write this, and implement outb/inb in io.h
 void init_irqs(){
   // 32 to 47
   for(uint8_t vector = 32; vector < 48; vector++){
@@ -72,7 +71,6 @@ void init_irqs(){
 isr_t interrupt_handlers[256];
 void irq_handler(registers_t *r){
 
-  printf("IRQ interrupt recv. r->int_no=%d (0x%x)\n", r->int_no, r->int_no);
   if(interrupt_handlers[r->int_no] != 0){
     // go handle it
     isr_t hdlr = interrupt_handlers[r->int_no];
