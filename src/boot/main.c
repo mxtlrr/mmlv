@@ -1,5 +1,4 @@
 #include <uefi.h>
-
 #include "structs.h"
 
 int main(){
@@ -69,9 +68,7 @@ int main(){
 
   s = gop->QueryMode(gop, gop->Mode == NULL ? 0 : gop->Mode->Mode,
                     &sizeInfo, &info);
-  if(s == EFI_NOT_STARTED){
-    s = gop->SetMode(gop, 0);
-  }
+  if(s == EFI_NOT_STARTED) s = gop->SetMode(gop, 0);
 
   // Error?
   if(EFI_ERROR(s)){
@@ -122,13 +119,13 @@ int main(){
   }
 
   mement = memory_map;
-  block_t blocks[256];
+  block_t blocks[256] = { 0 };
   
   do {
     if(mement->Type == EfiConventionalMemory){
       blocks[block_ctr].free = 0;
-      blocks[block_ctr].location = (uintptr_t)mement->PhysicalStart;
       blocks[block_ctr].size = mement->NumberOfPages;
+      blocks[block_ctr].location = mement->PhysicalStart;
 
       block_ctr++;
     }
@@ -142,19 +139,17 @@ int main(){
   // to 0x7FFFFFF_FFFFFFF and use that as our new block. In order to
   // prevent anything weird from happening, we make sure that:
   //    1. 0x7FFFFFF_0000000 is 0
-  //    2. All values are set to zero
   uint64_t d = (*(uint64_t*)0x70000FFF);
+  uint64_t yes_usable = 0;
 
   // Weirdly, I get a GPF if use the mentioned address in the comment above
   // So we'll use 0x70000FFF for now.
   if(d != 0){
     printf("Hm.... Open an issue on GitHub. I tried use extra memory for mmap.\n");
     for(;;);
-  }
-  uint64_t size_mmap = (0x7FFFFFFF - 0x70000FFF);
+  } else yes_usable = 1;
+  uint64_t size_mmap = 0xFFFF000;
 
-
-  printf("Got here.\n");
   // If we're still here, then we didn't get a GPF. Add this memory
   // location to the blocks
   blocks[block_ctr].free = 0;
@@ -187,14 +182,13 @@ int main(){
   };
 
   bootinfo_t bootp = {
-    .fb = &fb,
-    .blocks = blocks // This raises a warning. Why?
+    .fb     = &fb,
+    .blocks = &blocks, // This raises a warning. Why?
+    .usable = yes_usable
   };
 
   printf("Kernel is at 0x%p\n", entry);
   i = (*((int(* __attribute__((sysv_abi)))(bootinfo_t*))(entry)))(&bootp);
-  printf("Return value: %d\n", i);
 
   while(1);
-  return 0;
 }

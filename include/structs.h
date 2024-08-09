@@ -44,6 +44,7 @@ typedef struct {
 /* Bootloader stuff (stuff to pass to the bootloader) */
 typedef struct {
   framebuffer_t* fb;
-  ssfn_font_t* font;
-  block_t blocks[256];
+  ssfn_font_t*   font;
+  block_t        blocks[256];
+  uint64_t       usable; // Is 0x70000FFF usable?
 } bootinfo_t;

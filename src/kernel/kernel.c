@@ -9,6 +9,8 @@ extern void load_gdt(); // gdt.asm
 int _start(bootinfo_t* bootp){
   set_bootp(bootp);
 
+  printf("%x\n", bootp->usable);
+
   asm("cli");
   load_gdt();
   printf("[init] GDT loaded.\n");
