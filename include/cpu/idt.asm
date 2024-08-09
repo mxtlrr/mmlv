@@ -79,21 +79,20 @@ isr_cstb:
 
   PUSH_N
 
-  mov eax, ds
+  mov rax, ds
   push rax
-  mov eax, es
+  mov rax, es
   push rax
   push fs
   push gs
 
   mov eax, 0x10
-  mov ds, eax
-  mov es, eax
-  mov fs, eax
-  mov gs, eax
+  mov ds, rax
+  mov es, rax
+  mov fs, rax
+  mov gs, rax
 
-  mov rdi, rsp                 ; RDI = Pointer to registers_t
-
+  mov rdi, rsp                 ; RDI(Argument 1) = Pointer to registers_t
   call exception_handler
 
   pop gs
@@ -166,20 +165,20 @@ irq_cstb:
 
   PUSH_N
 
-  mov eax, ds
+  mov rax, ds
   push rax
-  mov eax, es
+  mov rax, es
   push rax
   push fs
   push gs
 
   mov eax, 0x10
-  mov ds, eax
-  mov es, eax
-  mov fs, eax
-  mov gs, eax
+  mov ds, rax
+  mov es, rax
+  mov fs, rax
+  mov gs, rax
 
-  mov rdi, rsp                 ; RDI = Pointer to registers_t
+  mov rdi, rsp                 ; RDI(Argument 1) = Pointer to registers_t
   call irq_handler
 
   pop gs
