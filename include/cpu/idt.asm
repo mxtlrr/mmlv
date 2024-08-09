@@ -93,7 +93,12 @@ isr_cstb:
   mov gs, rax
 
   mov rdi, rsp                 ; RDI(Argument 1) = Pointer to registers_t
+
+  mov rbp, rsp                 ; Save stack before alignment is applied
+  and rsp, -16                 ; Align RSP down to next 16-byte boundary per the ABI
+  cld                          ; ABI required DF be set forward (Df=0)
   call exception_handler
+  mov rsp, rbp                 ; Restore RSP to the value before alignment
 
   pop gs
   pop fs
@@ -179,7 +184,12 @@ irq_cstb:
   mov gs, rax
 
   mov rdi, rsp                 ; RDI(Argument 1) = Pointer to registers_t
+
+  mov rbp, rsp                 ; Save stack before alignment is applied
+  and rsp, -16                 ; Align RSP down to next 16-byte boundary per the ABI
+  cld                          ; ABI required DF be set forward (Df=0)
   call irq_handler
+  mov rsp, rbp                 ; Restore RSP to the value before alignment
 
   pop gs
   pop fs
