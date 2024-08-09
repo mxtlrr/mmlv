@@ -183,9 +183,9 @@ int main(){
 
   bootinfo_t bootp = {
     .fb     = &fb,
-    .blocks = &blocks, // This raises a warning. Why?
     .usable = yes_usable
   };
+  memcpy(bootp.blocks, blocks, sizeof(blocks));
 
   printf("Kernel is at 0x%p\n", entry);
   i = (*((int(* __attribute__((sysv_abi)))(bootinfo_t*))(entry)))(&bootp);
